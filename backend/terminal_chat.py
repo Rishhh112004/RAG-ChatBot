@@ -26,157 +26,78 @@ def rebuild_index():
 
 
 def upload_paragraph():
-
     paragraph = input("\nPaste paragraph:\n")
-
-    file_path = "data/knowledge_store.txt"
-
     import re
     import numpy as np
-    from datetime import datetime
     from services.embedding_service import EmbeddingService
-
-    # Read existing data
-    try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            existing_data = f.read()
-    except:
-        existing_data = ""
-
-    # Split new paragraph into sentences
-    new_sentences = re.split(r'(?<=[.!?])\s+', paragraph)
-    new_sentences = [s.strip() for s in new_sentences if s.strip()]
-
-    # Extract existing sentences
+    from services.db_service import DBService
+    db = DBService()
+    # Get existing data from MongoDB
+    existing_data = db.get_all_paragraphs()
     existing_sentences = set()
-
-    blocks = existing_data.split("---UPLOAD START---")
-
-    for block in blocks:
-        block = block.strip()
-        if not block:
-            continue
-
-        text = block.split("\n", 1)[1].replace("---UPLOAD END---", "").strip()
-
+    for item in existing_data:
+        text = item["text"]
         sentences = re.split(r'(?<=[.!?])\s+', text)
-
         for s in sentences:
             s = s.strip()
             if s:
                 existing_sentences.add(s)
-
-    # 🔥 Semantic Deduplication
+    # Split new paragraph
+    new_sentences = re.split(r'(?<=[.!?])\s+', paragraph)
+    new_sentences = [s.strip() for s in new_sentences if s.strip()]
+    # Semantic dedup
     embedder = EmbeddingService()
     existing_list = list(existing_sentences)
-
     unique_sentences = []
-
     for new_s in new_sentences:
-
         is_duplicate = False
-
         if existing_list:
             new_vec = embedder.embed_query(new_s)
             existing_vecs = embedder.embed_texts(existing_list)
-
             similarities = np.dot(existing_vecs, new_vec) / (
                 np.linalg.norm(existing_vecs, axis=1) * np.linalg.norm(new_vec)
             )
-
             if max(similarities) > 0.85:
                 is_duplicate = True
-
         if not is_duplicate:
             unique_sentences.append(new_s)
-
-    # If nothing new
     if len(unique_sentences) == 0:
         print("\nDuplicate information detected. Nothing new added.\n")
         return
-
-    # Save only new sentences
     final_text = " ".join(unique_sentences)
-
-    with open(file_path, "a", encoding="utf-8") as f:
-        f.write("\n---UPLOAD START---\n")
-        f.write(f"Timestamp: {datetime.now()}\n")
-        f.write(final_text + "\n")
-        f.write("---UPLOAD END---\n")
-
-    print("\nOnly new information stored.\n")
-
+    # Store in MongoDB (instead of .txt file)
+    db.insert_paragraph(final_text)
+    print("\nOnly new information stored in database.\n")
     rebuild_index()
-    
-# NEW FUCTION TO DELETE PARAGRAPH 
+
+
+# NEW FUNCTION TO DELETE PARAGRAPH
 def delete_paragraph():
-
-    import re
-
-    file_path = "data/knowledge_store.txt"
-
-    # Read file
-    with open(file_path, "r", encoding="utf-8") as f:
-        content = f.read()
-
-    # Extract blocks correctly
-    blocks = re.findall(r"---UPLOAD START---(.*?)---UPLOAD END---", content, re.DOTALL)
-
-    uploads = [block.strip() for block in blocks if block.strip()]
-
-    if len(uploads) == 0:
+    from services.db_service import DBService
+    db = DBService()
+    data = db.get_all_paragraphs()
+    if len(data) == 0:
         print("\nNo paragraphs available.\n")
         return
-
-    # 🔥 Print ALL paragraphs first
     print("\nUploaded Paragraphs:\n")
-
-    for i, block in enumerate(uploads):
-
-        lines = block.split("\n", 1)
-
-        if len(lines) > 1:
-            text = lines[1].strip()
-        else:
-            text = block.strip()
-
+    for i, item in enumerate(data):
+        text = item["text"]
         preview = text[:80].replace("\n", " ")
-
         print(f"{i+1}. {preview}...")
-
-    # 🔥 THEN take input (OUTSIDE loop)
     try:
         choices = input("\nEnter paragraph numbers to delete (comma separated): ")
-
         indices = list(set(int(x.strip()) for x in choices.split(",")))
-
-        # Validate indices
         for idx in indices:
-            if idx < 1 or idx > len(uploads):
+            if idx < 1 or idx > len(data):
                 print("\nInvalid selection\n")
                 return
-
     except:
         print("\nInvalid input\n")
         return
-
-    # Delete in reverse order
-    for idx in sorted(indices, reverse=True):
-        del uploads[idx - 1]
-
-    # Rebuild file
-    new_content = ""
-
-    for block in uploads:
-        new_content += "\n---UPLOAD START---\n"
-        new_content += block.strip() + "\n"
-        new_content += "---UPLOAD END---\n"
-
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(new_content)
-
-    print("\nParagraph(s) deleted successfully.\n")
-
+    # Get MongoDB IDs
+    ids_to_delete = [str(data[i-1]["_id"]) for i in indices]
+    db.delete_paragraphs(ids_to_delete)
+    print("\nParagraph(s) deleted successfully from database.\n")
     rebuild_index()
 
 
