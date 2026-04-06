@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Offline Q&A ChatBot</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- Sidebar -->
+<div class="sidebar">
+
+<h3>📄 Knowledge Base</h3>
+
+<ul id="fileList"></ul>
+
+<label class="upload-btn">
+📂 Upload Documents
+<input type="file" id="fileInput" multiple accept=".txt">
+</label>
+
+<div id="uploadStatus"></div>
+
+<div class="preview-box">
+<h4>Document Preview</h4>
+<div id="previewContent">Click a document to preview</div>
+</div>
+    
+</div>
+
+<!-- Chat Area -->
+<div class="chat-area">
+
+<div class="chat-header">
+
+<h2> Q&A ChatBot</h2>
+
+<div class="header-buttons">
+<button id="darkToggle" class="dark-btn">🌙 Dark Mode</button>
+<button onclick="clearChat()" class="clear-btn">Clear Chat</button>
+</div>
+
+</div>
+
+<div id="chatBox" class="chat-box"></div>
+
+<div class="chat-input">
+<input type="text" id="userInput" placeholder="Ask something from uploaded documents...">
+<button onclick="sendMessage()">➤</button>
+</div>
+
+</div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
