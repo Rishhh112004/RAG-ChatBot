@@ -69,6 +69,119 @@ def upload_paragraph():
     db.insert_paragraph(final_text)
     print("\nOnly new information stored in database.\n")
     rebuild_index()
+    
+    
+# NEW FUNCTION TO UPLOAD FILE (PDF/DOCX/TXT)
+def upload_file():
+    import os
+    import re
+    import numpy as np
+    from tkinter import Tk, filedialog
+    from services.file_loader import load_file
+    from services.embedding_service import EmbeddingService
+    from services.db_service import DBService
+
+    # Hide root tkinter window
+    root = Tk()
+    root.withdraw()
+    root.attributes('-topmost', True)   # bring to front
+    root.update()
+
+    print("\nChoose file input method:")
+    print("1. File Picker (GUI)")
+    print("2. Drag & Drop file into terminal")
+
+    choice = input("\nEnter choice (1 or 2): ")
+
+    if choice == "1":
+        file_path = filedialog.askopenfilename(
+            title="Select file",
+            filetypes=[
+                ("All Supported", "*.pdf *.docx *.txt"),
+                ("PDF files", "*.pdf"),
+                ("Word files", "*.docx"),
+                ("Text files", "*.txt"),
+            ]
+        )
+
+        if not file_path:
+            print("\nNo file selected.\n")
+            return
+
+    elif choice == "2":
+        file_path = input("\nDrag & drop file here:\n").strip().strip('"')
+
+        if not os.path.exists(file_path):
+            print("\nInvalid file path.\n")
+            return
+
+    else:
+        print("\nInvalid choice.\n")
+        return
+
+    # Load file content
+    text = load_file(file_path)
+
+    if not text.strip():
+        print("\nNo text extracted from file.\n")
+        return
+
+    print("\nFile loaded. Processing...\n")
+
+    db = DBService()
+
+    # Fetch existing data
+    existing_data = db.get_all_paragraphs()
+
+    existing_sentences = set()
+
+    for item in existing_data:
+        existing_text = item["text"]
+
+        sentences = re.split(r'(?<=[.!?])\s+', existing_text)
+
+        for s in sentences:
+            s = s.strip()
+            if s:
+                existing_sentences.add(s)
+
+    # Split new content
+    new_sentences = re.split(r'(?<=[.!?])\s+', text)
+    new_sentences = [s.strip() for s in new_sentences if s.strip()]
+
+    embedder = EmbeddingService()
+    existing_list = list(existing_sentences)
+
+    unique_sentences = []
+
+    for new_s in new_sentences:
+
+        is_duplicate = False
+
+        if existing_list:
+            new_vec = embedder.embed_query(new_s)
+            existing_vecs = embedder.embed_texts(existing_list)
+
+            similarities = np.dot(existing_vecs, new_vec) / (
+                np.linalg.norm(existing_vecs, axis=1) * np.linalg.norm(new_vec)
+            )
+
+            if max(similarities) > 0.85:
+                is_duplicate = True
+
+        if not is_duplicate:
+            unique_sentences.append(new_s)
+
+    if len(unique_sentences) == 0:
+        print("\nDuplicate information detected. Nothing new added.\n")
+        return
+    final_text = " ".join(unique_sentences)
+    
+    # Store in MongoDB
+    db.insert_paragraph(final_text)
+    print("\nOnly new information from file stored in database.\n")
+    rebuild_index()
+
 
 
 # NEW FUNCTION TO DELETE PARAGRAPH
@@ -127,8 +240,9 @@ def main():
         print("\nChoose option:")
         print("1. Ask Question")
         print("2. Upload Paragraph")
-        print("3. Delete Paragraph")
-        print("4. Exit")
+        print("3. Upload File (PDF/DOCX/TXT)")
+        print("4. Delete Paragraph")
+        print("5. Exit")
 
         choice = input("\nEnter choice: ")
 
@@ -137,11 +251,14 @@ def main():
 
         elif choice == "2":
             upload_paragraph()
-
+            
         elif choice == "3":
-            delete_paragraph()
+            upload_file()    
 
         elif choice == "4":
+            delete_paragraph()
+
+        elif choice == "5":
             print("\nExiting...\n")
             break
 
