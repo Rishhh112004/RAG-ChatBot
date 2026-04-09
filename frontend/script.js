@@ -1,179 +1,112 @@
-let uploadedData="";
-let documents={};
+const BASE_URL = "http://127.0.0.1:8000";
 
-const fileInput=document.getElementById("fileInput");
-const fileList=document.getElementById("fileList");
-const chatBox=document.getElementById("chatBox");
-const preview=document.getElementById("previewContent");
-const status=document.getElementById("uploadStatus");
-const darkToggle=document.getElementById("darkToggle");
-
-/* Welcome message */
-
-window.onload=function(){
-addMessage("Hello! Upload documents and ask questions.","bot");
-};
+const fileInput = document.getElementById("fileInput");
+const chatBox = document.getElementById("chatBox");
+const status = document.getElementById("uploadStatus");
 
 /* Upload files */
+fileInput.addEventListener("change", async function () {
 
-fileInput.addEventListener("change",function(){
+    const files = fileInput.files;
 
-const files=fileInput.files;
+    for (let file of files) {
 
-for(let file of files){
+        status.innerText = "Uploading " + file.name;
 
-status.innerText="Uploading "+file.name+"...";
+        const formData = new FormData();
+        formData.append("file", file);
 
-const reader=new FileReader();
+        try {
+            const res = await fetch(`${BASE_URL}/upload-file`, {
+                method: "POST",
+                body: formData
+            });
 
-reader.onload=function(e){
+            const data = await res.json();
 
-const content=e.target.result.toLowerCase();
+            status.innerText = data.message;
 
-documents[file.name]=content;
-
-uploadedData+=content+" ";
-
-status.innerText="Uploaded "+file.name;
-
-};
-
-reader.readAsText(file);
-
-const li=document.createElement("li");
-
-li.innerHTML="📄 "+file.name+" <span class='delete-btn'>❌</span>";
-
-li.onclick=()=>previewFile(file.name);
-
-li.querySelector(".delete-btn").onclick=(event)=>{
-
-event.stopPropagation();
-
-delete documents[file.name];
-
-li.remove();
-
-};
-
-fileList.appendChild(li);
-}
-
+        } catch (err) {
+            status.innerText = "Upload failed";
+        }
+    }
 });
 
-/* Preview document */
+/* Send question */
+async function sendMessage() {
 
-function previewFile(name){
-preview.innerText=documents[name].substring(0,300)+"...";
+    const input = document.getElementById("userInput");
+    const question = input.value.trim();
+
+    if (!question) return;
+
+    addMessage(question, "user");
+    input.value = "";
+
+    try {
+        const res = await fetch(`${BASE_URL}/ask`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ question })
+        });
+
+        const data = await res.json();
+
+        addMessage(data.answer, "bot");
+
+    } catch (err) {
+        addMessage("Backend not reachable", "bot");
+    }
 }
 
-/* Send message */
+/* UI message */
+function addMessage(text, type) {
 
-function sendMessage(){
+    const msg = document.createElement("div");
+    msg.classList.add("message", type);
+    msg.innerText = text;
 
-const input=document.getElementById("userInput");
-
-const question=input.value.trim();
-
-if(question==="") return;
-
-addMessage("👤 "+question,"user");
-
-setTimeout(()=>{
-searchAnswer(question);
-},500);
-
-input.value="";
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-/* Add message */
-
-function addMessage(text,type){
-
-const msg=document.createElement("div");
-
-msg.classList.add("message",type);
-
-const time=new Date().toLocaleTimeString();
-
-msg.innerHTML=text+"<div class='timestamp'>"+time+"</div>";
-
-chatBox.appendChild(msg);
-
-chatBox.scrollTop=chatBox.scrollHeight;
-}
-
-/* Search answer */
-
-function searchAnswer(question){
-
-if(!uploadedData){
-addMessage("⚠ Please upload data first.","bot");
-return;
-}
-
-const words=question.toLowerCase().split(" ");
-
-for(let word of words){
-
-if(word.length>3){
-
-for(let doc in documents){
-
-if(documents[doc].includes(word)){
-
-const highlighted=documents[doc]
-.replace(word,"<span class='highlight'>"+word+"</span>")
-.substring(0,200);
-
-addMessage(
-" Answer related to '"+word+"'<br><br>"+
-highlighted+
-"<br><br>Source: 📄 "+doc,
-"bot"
-);
-
-return;
-}
-}
-}
-}
-
-addMessage("⚠ No answer found in uploaded data","bot");
-}
-
-/* Enter key support */
-
-document.getElementById("userInput").addEventListener("keypress",function(e){
-
-if(e.key==="Enter") sendMessage();
-
+/* Enter key */
+document.getElementById("userInput").addEventListener("keypress", function (e) {
+    if (e.key === "Enter") sendMessage();
 });
 
 /* Clear chat */
-
-function clearChat(){
-chatBox.innerHTML="";
+function clearChat() {
+    chatBox.innerHTML = "";
 }
 
-/* Dark mode */
+async function uploadParagraph() {
 
-if(localStorage.getItem("theme")==="dark"){
-document.body.classList.add("dark-mode");
-darkToggle.innerText="☀ Light Mode";
+    const text = document.getElementById("paragraphInput").value.trim();
+
+    if (!text) {
+        alert("Enter paragraph first");
+        return;
+    }
+
+    try {
+        const res = await fetch(`${BASE_URL}/upload-text`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ paragraph: text })
+        });
+
+        const data = await res.json();
+
+        alert(data.message);
+
+        document.getElementById("paragraphInput").value = "";
+
+    } catch (err) {
+        alert("Upload failed");
+    }
 }
-
-darkToggle.addEventListener("click",()=>{
-
-document.body.classList.toggle("dark-mode");
-
-if(document.body.classList.contains("dark-mode")){
-localStorage.setItem("theme","dark");
-darkToggle.innerText="☀ Light Mode";
-}
-else{
-localStorage.setItem("theme","light");
-darkToggle.innerText="🌙 Dark Mode";
-}
-
-});

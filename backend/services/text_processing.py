@@ -1,6 +1,6 @@
 # WITH THE CODE BELOW, THE DATA IS GETTING STORED IN MONGODB DATABASE
 
-from services.db_service import DBService
+from backend.services.db_service import DBService
 def process_uploads():
     db = DBService()
     data = db.get_all_paragraphs()

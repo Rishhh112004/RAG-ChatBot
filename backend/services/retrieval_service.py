@@ -1,5 +1,5 @@
-from services.embedding_service import EmbeddingService
-from services.vector_store import VectorStore
+from backend.services.embedding_service import EmbeddingService
+from backend.services.vector_store import VectorStore
 
 
 class RetrievalService:

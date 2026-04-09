@@ -1,61 +1,50 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Offline Q&A ChatBot</title>
-<link rel="stylesheet" href="style.css">
+    <title>Offline RAG Chatbot</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div class="container">
+    <div class="container">
 
-<!-- Sidebar -->
-<div class="sidebar">
+        <!-- Sidebar -->
+        <div class="sidebar">
 
-<h3>📄 Knowledge Base</h3>
+            <h3>📄 Documents</h3>
+            <input type="file" id="fileInput" multiple accept=".txt,.pdf,.docx">
 
-<ul id="fileList"></ul>
+            <h4>✏️ Add Paragraph</h4>
+            <textarea id="paragraphInput" placeholder="Paste paragraph here..."></textarea>
+            <button onclick="uploadParagraph()">Upload Paragraph</button>
 
-<label class="upload-btn">
-📂 Upload Documents
-<input type="file" id="fileInput" multiple accept=".txt">
-</label>
+            <div id="uploadStatus"></div>
 
-<div id="uploadStatus"></div>
+        </div>
 
-<div class="preview-box">
-<h4>Document Preview</h4>
-<div id="previewContent">Click a document to preview</div>
-</div>
-    
-</div>
+        <!-- Chat Area -->
+        <div class="chat-area">
 
-<!-- Chat Area -->
-<div class="chat-area">
+            <div class="chat-header">
+                <h2>RAG Chatbot</h2>
+                <button onclick="clearChat()">Clear</button>
+            </div>
 
-<div class="chat-header">
+            <div id="chatBox" class="chat-box"></div>
 
-<h2> Q&A ChatBot</h2>
+            <div class="chat-input">
+                <input type="text" id="userInput" placeholder="Ask a question...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
 
-<div class="header-buttons">
-<button id="darkToggle" class="dark-btn">🌙 Dark Mode</button>
-<button onclick="clearChat()" class="clear-btn">Clear Chat</button>
-</div>
+        </div>
 
-</div>
+    </div>
 
-<div id="chatBox" class="chat-box"></div>
-
-<div class="chat-input">
-<input type="text" id="userInput" placeholder="Ask something from uploaded documents...">
-<button onclick="sendMessage()">➤</button>
-</div>
-
-</div>
-
-</div>
-
-<script src="script.js"></script>
+    <script src="script.js"></script>
 
 </body>
+
 </html>

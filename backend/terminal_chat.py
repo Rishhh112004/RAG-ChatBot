@@ -84,7 +84,7 @@ def upload_file():
     # Hide root tkinter window
     root = Tk()
     root.withdraw()
-    root.attributes('-topmost', True)   # bring to front
+    root.attributes('-topmost', True)   # bring to front  
     root.update()
 
     print("\nChoose file input method:")
