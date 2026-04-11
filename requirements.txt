@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+pydantic
+llama-cpp-python
+sentence-transformers
+faiss-cpu
+pymongo
+pypdf
+python-docx
+numpy
+nltk
+python-multipart
+bson

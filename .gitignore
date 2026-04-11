@@ -27,9 +27,9 @@ vector_store/
 *.pkl
 
 # ================================
-# 🔹 DATA FILES (OPTIONAL - depends on use)
+# 🔹 NLTK DATA
 # ================================
-data/*.txt
+nltk_data/
 
 # ================================
 # 🔹 ENVIRONMENT VARIABLES / SECRETS
@@ -47,6 +47,12 @@ data/*.txt
 # ================================
 .DS_Store
 Thumbs.db
+
+# ================================
+# 🔹 TEMPORARY FILES
+# ================================
+temp_*
+*.tmp
 
 # ================================
 # 🔹 LOGS & TEMP FILES
