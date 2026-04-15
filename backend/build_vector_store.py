@@ -1,6 +1,6 @@
-from services.text_processing import process_uploads
-from services.embedding_service import EmbeddingService
-from services.vector_store import VectorStore
+from backend.services.text_processing import process_uploads
+from backend.services.embedding_service import EmbeddingService
+from backend.services.vector_store import VectorStore
 def build_index():
     chunks = process_uploads()
     texts = [c["chunk_text"] for c in chunks]

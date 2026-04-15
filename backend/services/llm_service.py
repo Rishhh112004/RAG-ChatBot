@@ -28,6 +28,7 @@ class LLMService:
 You are an assistant that answers questions ONLY from the provided context.
 
 Give precise answer
+Do NOT explain extra details
 
 Chat History:
 {history}
@@ -48,8 +49,8 @@ Answer (short and precise):
             prompt,
             # max_tokens=200,
             # temperature=0.2
-            max_tokens=120,
-            temperature=0.2            
+            max_tokens=80-120,
+            temperature=0.1-0.2            
         )
 
         return response["choices"][0]["text"].strip()
