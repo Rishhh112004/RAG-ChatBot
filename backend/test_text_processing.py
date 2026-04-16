@@ -1,4 +1,4 @@
-from services.text_processing import process_uploads
+from backend.services.text_processing import process_uploads
 chunks = process_uploads()
 for c in chunks:
     print("\n--- CHUNK ---")

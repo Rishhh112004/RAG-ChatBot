@@ -6,6 +6,7 @@ from backend.routes.upload import router as upload_router
 from backend.services.retrieval_service import RetrievalService
 from backend.services.llm_service import LLMService
 
+chat_history = []
 
 app = FastAPI(title="Offline RAG Chatbot")
 
@@ -31,15 +32,19 @@ class QuestionRequest(BaseModel):
     question: str
 
 
-# 🔥 ADD THIS (IMPORTANT)
+# ADD THIS (IMPORTANT)
 @app.post("/ask")
 def ask_question(data: QuestionRequest):
 
     chunks = retriever.retrieve(data.question)
 
-    answer = llm.generate_answer(data.question, chunks)
+    answer = llm.generate_answer(data.question, chunks, chat_history)
+
+    # 🔥 store chat
+    chat_history.append((data.question, answer))
 
     return {
+        "question": data.question,
         "answer": answer
     }
 

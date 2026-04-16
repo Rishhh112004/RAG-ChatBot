@@ -1,4 +1,4 @@
-from services.retrieval_service import RetrievalService
+from backend.services.retrieval_service import RetrievalService
 retriever = RetrievalService()
 question = "Who is the manager?"
 results = retriever.retrieve(question)

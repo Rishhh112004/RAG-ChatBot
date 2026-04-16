@@ -1,5 +1,5 @@
-from services.retrieval_service import RetrievalService
-from services.llm_service import LLMService
+from backend.services.retrieval_service import RetrievalService
+from backend.services.llm_service import LLMService
 retriever = RetrievalService()
 llm = LLMService()
 question = "Who is the manager?"

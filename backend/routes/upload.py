@@ -1,9 +1,11 @@
+import os
 from fastapi import APIRouter, UploadFile, File
 from pydantic import BaseModel
 from datetime import datetime
 import re
 import numpy as np
 
+from backend.build_vector_store import build_vector_store
 from backend.services.db_service import DBService
 from backend.services.embedding_service import EmbeddingService
 from backend.services.file_loader import load_file
@@ -74,6 +76,10 @@ def upload_paragraph(data: UploadRequest):
     final_text = " ".join(unique_sentences)
 
     db.insert_paragraph(final_text)
+    build_vector_store()
+    
+    import os
+    os.system("python backend/build_vector_store.py")
 
     return {"message": "New information stored successfully"}
 
@@ -142,6 +148,10 @@ async def upload_file(file: UploadFile = File(...)):
         final_text = " ".join(unique_sentences)
 
         db.insert_paragraph(final_text)
+        build_vector_store()
+        
+        import os
+        os.system("python backend/build_vector_store.py")
 
         return {"message": f"{file.filename} processed and stored"}
 

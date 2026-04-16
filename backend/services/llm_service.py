@@ -15,7 +15,7 @@ class LLMService:
 
     def generate_answer(self, question, chunks, chat_history=None):
 
-        context = "\n".join([c["chunk_text"] for c in chunks])
+        context = chunks[0]["chunk_text"]
         # context = chunks[0]["chunk_text"]
         
         history = ""
@@ -28,7 +28,7 @@ class LLMService:
 You are an assistant that answers questions ONLY from the provided context.
 
 Give precise answer
-Do NOT explain extra details
+Do NOT provide extra details, just exact and related answer from the context.
 
 Chat History:
 {history}
