@@ -7,38 +7,33 @@
 </head>
 
 <body>
-
     <div class="container">
 
         <!-- Sidebar -->
         <div class="sidebar">
-
             <h3>📄 Documents</h3>
             <input type="file" id="fileInput" multiple accept=".txt,.pdf,.docx">
-
             <h4>✏️ Add Paragraph</h4>
             <textarea id="paragraphInput" placeholder="Paste paragraph here..."></textarea>
             <button onclick="uploadParagraph()">Upload Paragraph</button>
-
             <div id="uploadStatus"></div>
-
+            <h3>💬 Chats</h3>
+            <div id="sessionList"></div>
+            <button onclick="loadSessions()">Refresh Chats</button>
         </div>
 
         <!-- Chat Area -->
         <div class="chat-area">
-
             <div class="chat-header">
                 <h2>RAG Chatbot</h2>
                 <button onclick="clearChat()">Clear</button>
+                <button onclick="newChat()">New Chat</button>
             </div>
-
             <div id="chatBox" class="chat-box"></div>
-
             <div class="chat-input">
                 <input type="text" id="userInput" placeholder="Ask a question...">
                 <button onclick="sendMessage()">Send</button>
             </div>
-
         </div>
 
     </div>
@@ -46,5 +41,4 @@
     <script src="script.js"></script>
 
 </body>
-
 </html>
