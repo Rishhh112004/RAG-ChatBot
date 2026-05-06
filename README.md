@@ -139,7 +139,6 @@ python backend/build_vector_store.py
 ## Notes
 
 - The repository currently supports the browser-based UI.
-- There is no dedicated terminal chat interface in the current codebase.
 - Uploaded text is stored in MongoDB and indexed with FAISS.
 - Generated index files include `vector_store.index` and `chunks.pkl`.
 
@@ -165,15 +164,6 @@ python backend/build_vector_store.py
    - Upload documents using the file input
    - Ask questions in the chat interface
    - Responses are generated based on uploaded content
-
-### Terminal Interface
-
-Run the PowerShell script:
-```powershell
-.\run_chatbot.ps1
-```
-
-This provides a command-line interface for uploading files, asking questions, and managing documents.
 
 ## API Documentation
 
@@ -227,4 +217,4 @@ Content-Type: application/json
 - Embedding model: sentence-transformers/all-MiniLM-L6-v2
 - Vector search: FAISS IndexFlatL2
 - Chunk size: Configurable in text_processing.py
-- Top-k retrieval: 5 chunks
+- Top-k retrieval: 4 chunks
