@@ -197,7 +197,8 @@ async function loadSessions() {
             item.classList.add("session-item");
             item.innerText = s.title || s.id;
             if (s.id === currentSessionId) {
-                item.classList.add("active-session");
+                // item.classList.add("active-session");
+                row.classList.add("active-row");
             }
             item.onclick = () => loadChat(s.id);
  
