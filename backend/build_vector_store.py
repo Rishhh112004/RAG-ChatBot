@@ -27,7 +27,5 @@ def build_vector_store():
 
     print("Vector store built successfully")
 
-
-# 👇 IMPORTANT
 if __name__ == "__main__":
     build_vector_store()

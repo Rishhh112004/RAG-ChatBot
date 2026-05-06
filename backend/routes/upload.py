@@ -15,14 +15,12 @@ router = APIRouter(tags=["Upload"])
 db = DBService()
 embedder = EmbeddingService()
 
-
 # =========================
 #  TEXT PARAGRAPH UPLOAD
 # =========================
 
 class UploadRequest(BaseModel):
     paragraph: str
-
 
 @router.post("/upload-text")
 def upload_paragraph(data: UploadRequest):
@@ -77,12 +75,8 @@ def upload_paragraph(data: UploadRequest):
 
     db.insert_paragraph(final_text)
     build_vector_store()
-    
-    import os
-    os.system("python backend/build_vector_store.py")
 
     return {"message": "New information stored successfully"}
-
 
 # =========================
 #  FILE UPLOAD (PDF/DOCX/TXT)
@@ -149,9 +143,6 @@ async def upload_file(file: UploadFile = File(...)):
 
         db.insert_paragraph(final_text)
         build_vector_store()
-        
-        import os
-        os.system("python backend/build_vector_store.py")
 
         return {"message": f"{file.filename} processed and stored"}
 
