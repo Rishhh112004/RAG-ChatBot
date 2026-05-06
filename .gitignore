@@ -12,11 +12,14 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.py[cod]
+*$py.class
 
 # ================================
 # 🔹 MODEL FILES (VERY LARGE - DO NOT PUSH)
 # ================================
 models/*.gguf
+models/*.bin
 
 # ================================
 # 🔹 VECTOR DATABASE FILES (REGENERATABLE)
@@ -25,6 +28,8 @@ vector_store/
 *.bin
 *.index
 *.pkl
+vector_store.index
+chunks.pkl
 
 # ================================
 # 🔹 NLTK DATA
@@ -35,18 +40,60 @@ nltk_data/
 # 🔹 ENVIRONMENT VARIABLES / SECRETS
 # ================================
 .env
+.env.local
+.env.production
+.env.staging
 
 # ================================
 # 🔹 IDE / EDITOR FILES
 # ================================
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
 # ================================
 # 🔹 SYSTEM FILES
 # ================================
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# ================================
+# 🔹 LOGS AND TEMP FILES
+# ================================
+*.log
+logs/
+temp/
+*.tmp
+*.temp
+
+# ================================
+# 🔹 OS GENERATED FILES
+# ================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ================================
+# 🔹 DATABASE FILES
+# ================================
+*.db
+*.sqlite
+*.sqlite3
+
+# ================================
+# 🔹 BUILD AND DISTRIBUTION
+# ================================
+build/
+dist/
+*.egg-info/
+*.whl
 
 # ================================
 # 🔹 TEMPORARY FILES
