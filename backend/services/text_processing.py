@@ -14,20 +14,7 @@ def process_uploads():
     return chunks
 
 def chunk_text(text, upload_id, timestamp):
-    """
-    Smart chunking with colon-header merging.
 
-    Key fix: when a prose sentence ends with ':' or ': -' and the
-    next block is a list, they are merged into ONE chunk so the
-    header context and the list items are always retrieved together.
-
-    Example (DOC 7):
-        "MOIL produces and sells different grades. They are: -
-         High Grade Ores for production of Ferro manganese
-         Medium grade ore..."
-    Without merging: header → prose chunk, grades → separate chunk.
-    With merging: both → single chunk → LLM sees complete answer.
-    """
     chunks = []
 
     # Split into logical blocks on blank lines
@@ -39,7 +26,7 @@ def chunk_text(text, upload_id, timestamp):
     i = 0
     while i < len(blocks):
         block = blocks[i]
-        # Check if this block ends with a colon (header introducing a list)
+        # Check if this block ends with a colon
         stripped = block.rstrip()
         if (stripped.endswith(':') or stripped.endswith(': -') or stripped.endswith(':-')) \
                 and i + 1 < len(blocks):
@@ -57,7 +44,6 @@ def chunk_text(text, upload_id, timestamp):
 
         lines = block.splitlines()
 
-        # Also treat newline-only separated items (no bullets) as structured
         # if the block has 3+ short lines — typical for uploaded plain lists
         structured = _is_structured_block(lines)
 

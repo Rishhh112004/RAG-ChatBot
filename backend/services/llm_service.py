@@ -3,7 +3,6 @@ from llama_cpp import Llama
 
 MODEL_PATH = "models/mistral.gguf"
 
-
 class LLMService:
 
     def __init__(self):

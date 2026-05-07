@@ -5,7 +5,6 @@ def rewrite_query(query: str, llm=None) -> str:
     cleaned = query.strip().lower()
 
     # Remove leading question phrase patterns that add noise to the embedding
-    # These words don't help retrieve documents — strip them
     filler_prefixes = [
         r"^can you (tell me |please |)?",
         r"^please (tell me |)?",

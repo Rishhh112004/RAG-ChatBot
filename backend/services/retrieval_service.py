@@ -3,14 +3,11 @@ import numpy as np
 from backend.services.embedding_service import EmbeddingService
 from backend.services.vector_store import VectorStore
 from backend.services.query_rewriter import rewrite_query
-
-# rank_bm25 is added 
 from rank_bm25 import BM25Okapi
 
 def _tokenize(text: str) -> list:
     """Simple whitespace + lowercase tokenizer for BM25."""
     return re.findall(r"\w+", text.lower())
-
 
 class RetrievalService:
 
@@ -31,27 +28,27 @@ class RetrievalService:
 
     def retrieve(self, query: str, k: int = 10) -> list:
 
-        # Step 1: Clean query (remove filler words)
+        #Remove filler words
         cleaned = rewrite_query(query)
 
-        # --- FAISS semantic search ---
+        #FAISS semantic search
         query_vec = self.embedder.embed_query(cleaned)
         D, I = self.vector_store.index.search(np.array([query_vec]), k)
 
-        # Build FAISS score map: chunk_index → semantic_score
+        #Build FAISS score
         faiss_scores = {}
         for rank, idx in enumerate(I[0]):
             if idx < 0 or idx >= len(self.vector_store.chunks):
                 continue
             faiss_scores[int(idx)] = 1 / (1 + D[0][rank])
 
-        # --- BM25 keyword search ---
+        #BM25 keyword search
         bm25_scores = {}
         if self.bm25 is not None:
             tokens = _tokenize(cleaned)
             raw_scores = self.bm25.get_scores(tokens)
 
-            # Normalize BM25 scores to [0, 1]
+            #Normalize BM25 scores to [0, 1]
             max_bm25 = max(raw_scores) if max(raw_scores) > 0 else 1.0
             for idx, score in enumerate(raw_scores):
                 bm25_scores[idx] = score / max_bm25
@@ -73,9 +70,7 @@ class RetrievalService:
             if bonus:
                 phrase_bonus_map[idx] = bonus
 
-        # --- Combine all scores ---
         if self.bm25 is not None:
-            # Get top-k BM25 indices
             top_bm25 = sorted(bm25_scores.keys(),
                               key=lambda x: bm25_scores[x], reverse=True)[:k]
         else:

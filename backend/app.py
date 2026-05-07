@@ -22,7 +22,6 @@ app.add_middleware(
 
 app.include_router(upload_router)
 
-# Load services once at startup — NOT inside RetrievalService
 retriever = RetrievalService()
 llm = LLMService()
 
@@ -38,11 +37,7 @@ def ask_question(data: QuestionRequest):
     else:
         session_id = data.session_id
 
-    # Clean the query before retrieval (rule-based, instant — no LLM call)
-    # Synonym expansion happens inside retriever.retrieve()
     cleaned_question = rewrite_query(data.question)
-
-    # Retrieve using cleaned query; LLM gets original question for natural phrasing
     chunks = retriever.retrieve(cleaned_question)
     answer = llm.generate_answer(data.question, chunks)
 
@@ -56,9 +51,8 @@ def ask_question(data: QuestionRequest):
 
 @app.get("/sessions")
 def get_sessions():
-    # Uses the improved get_sessions_with_titles() from db_service
     sessions = db.get_sessions_with_titles()
-    return sessions  # already returns [{"id": ..., "title": ...}]
+    return sessions  #returns id and title
 
 @app.get("/chat/{session_id}")
 def get_chat(session_id: str):

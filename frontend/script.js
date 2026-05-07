@@ -6,7 +6,7 @@ const status = document.getElementById("uploadStatus");
 
 let currentSessionId = null;
 
-/* ── File upload ── */
+/*File upload*/
 fileInput.addEventListener("change", async function () {
     const files = fileInput.files;
     for (let file of files) {
@@ -27,7 +27,7 @@ fileInput.addEventListener("change", async function () {
     fileInput.value = "";      // Reset so the same file can be re-uploaded if needed
 });
 
-/* ── Send question ── */
+/*Send question*/
 async function sendMessage() {
     const input = document.getElementById("userInput");
     const question = input.value.trim();
@@ -36,7 +36,7 @@ async function sendMessage() {
     addMessage(question, "user");
     input.value = "";
 
-    const loadingId = addLoadingMessage();     // Show a loading indicator while waiting for the (slow) LLM
+    const loadingId = addLoadingMessage();   // Show a loading indicator while waiting for the LLM
 
     try {
         const res = await fetch(`${BASE_URL}/ask`, {
@@ -58,7 +58,7 @@ async function sendMessage() {
     }
 }
 
-/* ── Add a chat bubble ── */
+/*Add a chat bubble*/
 function addMessage(text, type) {
     const msg = document.createElement("div");
     msg.classList.add("message", type);
@@ -68,13 +68,13 @@ function addMessage(text, type) {
     return msg;
 }
 
-/* ── Loading indicator ── */
+/*Loading indicator*/
 function addLoadingMessage() {
     const id = "loading-" + Date.now();
     const msg = document.createElement("div");
     msg.classList.add("message", "bot", "loading");
     msg.id = id;
-    msg.innerText = "Fetching Answer...";
+    msg.innerText = "Fetching Answer...";   //message shown while waiting for answer
     chatBox.appendChild(msg);
     chatBox.scrollTop = chatBox.scrollHeight;
     return id;
@@ -85,23 +85,23 @@ function removeLoadingMessage(id) {
     if (el) el.remove();
 }
 
-/* ── Enter key to send ── */
+/*Enter key to send*/
 document.getElementById("userInput").addEventListener("keypress", function (e) {
     if (e.key === "Enter") sendMessage();
 });
 
-/* ── Clear visible chat (keeps session) ── */
+/*Clear visible chat*/
 function clearChat() {
     chatBox.innerHTML = "";
 }
 
-/* ── Start a new session ── */
+/*Start a new session*/
 function newChat() {
     currentSessionId = null;
     chatBox.innerHTML = "";
 }
 
-/* ── Upload paragraph text ── */
+/*Upload paragraph*/
 async function uploadParagraph() {
     const text = document.getElementById("paragraphInput").value.trim();
     if (!text) {
@@ -123,62 +123,7 @@ async function uploadParagraph() {
     }
 }
 
-/* ── Load session list (shows titles) ── */
-function addLoadingMessage() {
-    const id = "loading-" + Date.now();
-    const msg = document.createElement("div");
-    msg.classList.add("message", "bot", "loading");
-    msg.id = id;
-    msg.innerText = "Thinking...";
-    chatBox.appendChild(msg);
-    chatBox.scrollTop = chatBox.scrollHeight;
-    return id;
-}
- 
-function removeLoadingMessage(id) {
-    const el = document.getElementById(id);
-    if (el) el.remove();
-}
- 
-/* ── Enter key to send ── */
-document.getElementById("userInput").addEventListener("keypress", function (e) {
-    if (e.key === "Enter") sendMessage();
-});
- 
-/* ── Clear visible chat (keeps session) ── */
-function clearChat() {
-    chatBox.innerHTML = "";
-}
- 
-/* ── Start a new session ── */
-function newChat() {
-    currentSessionId = null;
-    chatBox.innerHTML = "";
-}
- 
-/* ── Upload paragraph text ── */
-async function uploadParagraph() {
-    const text = document.getElementById("paragraphInput").value.trim();
-    if (!text) {
-        alert("Enter a paragraph first");
-        return;
-    }
-    status.innerText = "Uploading paragraph...";
-    try {
-        const res = await fetch(`${BASE_URL}/upload-text`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ paragraph: text })
-        });
-        const data = await res.json();
-        status.innerText = data.message;
-        document.getElementById("paragraphInput").value = "";
-    } catch (err) {
-        status.innerText = "Upload failed";
-    }
-}
- 
-/* ── Load session list ── */
+/*Load session list*/
 async function loadSessions() {
     try {
         const res = await fetch(`${BASE_URL}/sessions`);
@@ -192,23 +137,22 @@ async function loadSessions() {
             const row = document.createElement("div");
             row.classList.add("session-row");
  
-            // Title area — click to load chat
+            // Title area
             const item = document.createElement("div");
             item.classList.add("session-item");
             item.innerText = s.title || s.id;
             if (s.id === currentSessionId) {
-                // item.classList.add("active-session");
                 row.classList.add("active-row");
             }
             item.onclick = () => loadChat(s.id);
  
-            // Delete button — click to delete this session
+            // Delete button
             const del = document.createElement("button");
             del.classList.add("delete-btn");
             del.innerText = "✕";
             del.title = "Delete this chat";
             del.onclick = (e) => {
-                e.stopPropagation(); // don't trigger loadChat
+                e.stopPropagation(); 
                 deleteSession(s.id);
             };
  
@@ -221,14 +165,14 @@ async function loadSessions() {
     }
 }
  
-/* ── Delete a session ── */
+/*Delete a session*/
 async function deleteSession(sessionId) {
     if (!confirm("Delete this chat? This cannot be undone.")) return;
  
     try {
         await fetch(`${BASE_URL}/chat/${sessionId}`, { method: "DELETE" });
  
-        // If the deleted session was open, clear the chat area
+        // If the deleted session was open, clear the chat area appears 
         if (sessionId === currentSessionId) {
             currentSessionId = null;
             chatBox.innerHTML = "";
@@ -240,7 +184,7 @@ async function deleteSession(sessionId) {
     }
 }
 
-/* ── Load a past chat ── */
+/*Load any past chat*/
 async function loadChat(sessionId) {
     currentSessionId = sessionId;
 
