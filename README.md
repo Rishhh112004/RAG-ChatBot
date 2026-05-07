@@ -218,3 +218,10 @@ Content-Type: application/json
 - Vector search: FAISS IndexFlatL2
 - Chunk size: Configurable in text_processing.py
 - Top-k retrieval: 4 chunks
+
+## Working Screenshots
+
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/1dd04ccb-0b37-471b-869b-18287f1de74f" />
+
+<img width="1919" height="996" alt="image" src="https://github.com/user-attachments/assets/d371a800-f30a-4faf-a369-694cb6af8470" />
+
